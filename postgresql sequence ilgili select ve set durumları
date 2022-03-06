@@ -1,0 +1,5 @@
+select nextval('belge_arsiv_objectid_seq')   --enson değeri verir
+
+select pg_get_serial_sequence('"belge_arsiv"', 'objectid')    -- hangi sequence ye baktığını grebilirsin
+
+alter sequence belge_arsiv_objectid_seq owned by belge_arsiv.objectid;   -- tablonun  hangi sequence ye bakacağını set edersin.
