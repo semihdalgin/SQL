@@ -1,0 +1,22 @@
+-- View: public.belnet_fenis_eksure_kalan_gun
+
+-- DROP VIEW public.belnet_fenis_eksure_kalan_gun;
+
+CREATE OR REPLACE VIEW public.belnet_fenis_eksure_kalan_gun
+ AS
+ SELECT kod_ihale.objectid,
+    kod_ihale.ihale_kayit_no,
+    kod_ihale.ihale_adi,
+    kod_ihale.ihale_firma,
+    kod_ihale.ihale_tarih,
+        CASE
+            WHEN date_part('days'::text, kod_ihale.sure_uzat_tar::timestamp with time zone - now()) = 0::double precision THEN 'Bugün Bitecektir'::text
+            WHEN date_part('days'::text, kod_ihale.sure_uzat_tar::timestamp with time zone - now()) < 0::double precision THEN date_part('days'::text, now() - kod_ihale.sure_uzat_tar::timestamp with time zone) || ' Gün Geçmiştir'::text
+            ELSE date_part('days'::text, kod_ihale.sure_uzat_tar::timestamp with time zone - now()) || ' Gün Kalmıştır'::text
+        END AS ek_sure
+   FROM kod_ihale
+  WHERE kod_ihale.sure_uzat_tar IS NOT NULL;
+
+ALTER TABLE public.belnet_fenis_eksure_kalan_gun
+    OWNER TO postgres;
+
