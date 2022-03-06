@@ -1,0 +1,36 @@
+
+insert into geoyol_vertex(yol_id,uzunluk,poly,geo_durum,m_log_user,m_status,m_date)
+select
+                k1.objectid as yol_id,length(MakeLine(k1.sp,k1.ep)) as uzunluk,MakeLine(k1.sp,k1.ep) as poly,
+                'True' as geo_durum,'Netcad_Admin' as user,'CREATE' as status,current_date as ndate
+from (
+                               SELECT objectid,
+                               pointn(poly,generate_series(1,npoints(poly)-1)) as sp,
+                               pointn(poly, generate_series(2,npoints(poly))) as ep
+                               FROM geoyol
+                               where geo_durum = 'True'
+                ) AS k1;
+ 
+ 
+Srid set edilmesi :
+ 
+update geoyol_vertex set poly = setsrid(poly,32768);
+ 
+ 
+spatial index yenileniyor :
+ 
+DROP INDEX if exists gix_yol_vertex ;
+CREATE INDEX gix_yol_vertex ON geoyol_vertex USING gist (poly);
+/*PK için index oluşturuluyor*/
+DROP INDEX if exists  pk_yol_vertex;
+CREATE UNIQUE INDEX pk_yol_vertex
+                ON geoyol_vertex USING btree (objectid)
+                TABLESPACE pg_default;
+ 
+Kısayol Tablosu oluşturuluyor.
+select * into kisayol from
+(select (geoyol.yol_adi::text || ' '::text) || kod_yol_turu.adi::text AS yol_adi, round(geoyol_vertex.uzunluk::numeric, 3) AS round, geoyol_vertex.objectid, geoyol_vertex.poly
+   FROM geoyol
+   JOIN geoyol_vertex ON geoyol.objectid = geoyol_vertex.yol_id
+   JOIN kod_yol_turu ON geoyol.yol_turu_id = kod_yol_turu.kod
+  WHERE geoyol.geo_durum = true) as kk;
