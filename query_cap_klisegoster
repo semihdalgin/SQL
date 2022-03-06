@@ -1,0 +1,28 @@
+-- View: public.query_cap_klisegoster
+
+-- DROP VIEW public.query_cap_klisegoster;
+
+CREATE OR REPLACE VIEW public.query_cap_klisegoster
+ AS
+ SELECT kt.cap_id AS objectid,
+    k.adi,
+        CASE
+            WHEN kt.path IS NULL THEN '---'::character varying(255)
+            ELSE kt.path
+        END AS path,
+        CASE
+            WHEN kt.tarih IS NULL THEN '1900-01-01'::character varying
+            ELSE kt.tarih
+        END AS tarih,
+    (kt.bilgisayar::text || '~'::text) || kt.kullanici::text AS pc,
+    kt.altcizelge,
+    kt.parsel_id,
+    kt.geo_durum,
+    kt.m_status
+   FROM kayit_tutanak kt
+     LEFT JOIN kod_kayit_tutanak_durum k ON k.kod = kt.durum
+  WHERE kt.m_status::text <> 'DELETE'::text AND kt.durum <> 5 AND NOT kt.path IS NULL
+  ORDER BY kt.tarih DESC;
+
+ALTER TABLE public.query_cap_klisegoster
+    OWNER TO postgres;
