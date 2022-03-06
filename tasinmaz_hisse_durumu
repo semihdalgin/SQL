@@ -1,0 +1,44 @@
+-- View: public.tasinmaz_hisse_durumu
+
+-- DROP VIEW public.tasinmaz_hisse_durumu;
+
+CREATE OR REPLACE VIEW public.tasinmaz_hisse_durumu
+ AS
+ SELECT q.objectid,
+    q.islem_tipi,
+    q.pay,
+    q.payda,
+    q.alan_satan_adi,
+    q.satis_alis_sebebi,
+    q.tescil_tarihi,
+    q.encumen_karar_tarihi,
+    q.encumen_no,
+    q.tasinmaz_id,
+    q.ilkoran,
+    q.hareketsonucu,
+    q.sonpay,
+    q.sonpayda,
+    COALESCE(q.ilkoran, 0::numeric) + COALESCE(q.hareketsonucu, 0::numeric) AS hissedurumu
+   FROM ( SELECT et.objectid,
+            et.islem_tipi,
+            et.pay,
+            et.payda,
+            et.alan_satan_adi,
+            et.satis_alis_sebebi,
+            et.tescil_tarihi,
+            et.encumen_karar_tarihi,
+            et.encumen_no,
+            et.tasinmaz_id,
+            e.ilkpay::numeric(15,2) / e.payda::numeric AS ilkoran,
+            ( SELECT sum(('-2'::integer * et2.islem_tipi + 3)::numeric * (et2.pay::numeric(15,5) / et2.payda::numeric)) AS sum
+                   FROM emlak_hisse_takip_eski et2
+                  WHERE et2.tasinmaz_id = et.tasinmaz_id AND (et2.tescil_tarihi < et.tescil_tarihi OR et2.tescil_tarihi = et.tescil_tarihi AND et2.objectid <= et.objectid)) AS hareketsonucu,
+            0 AS sonpay,
+            1 AS sonpayda
+           FROM emlak_hisse_takip_eski et,
+            emlak_arsa_belediye_eski e
+          WHERE et.tasinmaz_id = e.objectid) q;
+
+ALTER TABLE public.tasinmaz_hisse_durumu
+    OWNER TO postgres;
+
