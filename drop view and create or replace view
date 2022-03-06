@@ -1,0 +1,23 @@
+SELECT 'drop view' || ' ' || table_name ||';'  FROM   INFORMATION_SCHEMA.VIEWS where table_schema ='public' AND table_name not in ('geography_columns','geometry_columns','raster_columns','raster_overviews')
+
+UNION ALL
+
+SELECT 'create or replace view' ||' '|| table_name ||' '|| ' as' || ' ' || view_definition||' ' FROM   INFORMATION_SCHEMA.VIEWS where table_schema ='public' AND table_name not in ('geography_columns','geometry_columns','raster_columns','raster_overviews')
+
+ 
+
+ 
+
+ 
+
+ 
+
+SELECT 'drop view' || ' ' || table_name ||';'  FROM   INFORMATION_SCHEMA.VIEWS where table_schema ='public'
+
+and  view_definition like '%parsel%'
+
+UNION ALL
+
+SELECT 'create or replace view' ||' '|| table_name ||' '|| ' as' || ' ' || view_definition||' ' FROM   INFORMATION_SCHEMA.VIEWS where table_schema ='public'
+
+and  view_definition like '%parsel%'
