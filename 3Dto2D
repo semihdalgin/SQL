@@ -1,15 +1,13 @@
 alter TABLE geoyol alter column poly type geometry(geometry,32770)  --tabloya projeksiyon tanımlama
 
- 
-
- 
 
 update geoyol set poly=st_force2d(poly)  -- 3 boyuttan 2 boyuda
-
- 
-
- 
-
  
 
 update  geoyol set poly =st_setsrid(poly,32770)    -- tablodaki verilere projeksiyon verme
+
+select nextval('belge_arsiv_objectid_seq')   --enson değeri verir
+
+select pg_get_serial_sequence('"belge_arsiv"', 'objectid')    -- hangi sequence ye baktığını grebilirsin
+
+alter sequence belge_arsiv_objectid_seq owned by belge_arsiv.objectid;   -- tablonun  hangi sequence ye bakacağını set edersin.
