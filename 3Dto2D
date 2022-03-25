@@ -1,0 +1,15 @@
+alter TABLE geoyol alter column poly type geometry(geometry,32770)  --tabloya projeksiyon tanımlama
+
+ 
+
+ 
+
+update geoyol set poly=st_force2d(poly)  -- 3 boyuttan 2 boyuda
+
+ 
+
+ 
+
+ 
+
+update  geoyol set poly =st_setsrid(poly,32770)    -- tablodaki verilere projeksiyon verme
