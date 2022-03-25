@@ -11,3 +11,25 @@ select nextval('belge_arsiv_objectid_seq')   --enson değeri verir
 select pg_get_serial_sequence('"belge_arsiv"', 'objectid')    -- hangi sequence ye baktığını grebilirsin
 
 alter sequence belge_arsiv_objectid_seq owned by belge_arsiv.objectid;   -- tablonun  hangi sequence ye bakacağını set edersin.
+
+CREATE ROLE yigm  LOGIN ENCRYPTED PASSWORD '123yigm456'
+
+   VALID UNTIL 'infinity';
+
+
+select 'GRANT SELECT ON TABLE'||' '||table_name ||' '||'to yigm;' from information_schema.tables where table_schema='public'
+SELECT 'drop view' || ' ' || table_name ||';'  FROM   INFORMATION_SCHEMA.VIEWS where table_schema ='public' AND table_name not in ('geography_columns','geometry_columns','raster_columns','raster_overviews')
+
+UNION ALL
+
+SELECT 'create or replace view' ||' '|| table_name ||' '|| ' as' || ' ' || view_definition||' ' FROM   INFORMATION_SCHEMA.VIEWS where table_schema ='public' AND table_name not in ('geography_columns','geometry_columns','raster_columns','raster_overviews')
+
+SELECT 'drop view' || ' ' || table_name ||';'  FROM   INFORMATION_SCHEMA.VIEWS where table_schema ='public'
+
+and  view_definition like '%parsel%'
+
+UNION ALL
+
+SELECT 'create or replace view' ||' '|| table_name ||' '|| ' as' || ' ' || view_definition||' ' FROM   INFORMATION_SCHEMA.VIEWS where table_schema ='public'
+
+and  view_definition like '%parsel%'
